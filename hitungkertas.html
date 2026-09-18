@@ -83,27 +83,31 @@
   }
 
   *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
+  html,body{margin:0;padding:0;max-width:100%;overflow-x:hidden;}
   body{
     background:var(--bg);
     color:var(--text);
     font-family:'Space Grotesk', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
     line-height:1.45;
-    padding:28px 18px 60px;
+    padding:104px 18px 60px;
   }
-  .wrap{max-width:1080px;margin:0 auto;}
+  .wrap{width:100%;max-width:1080px;min-width:0;margin:0 auto;}
 
   header{margin-bottom:26px;}
   .navbar{
-    position:sticky;
+    position:fixed;
     top:0;
+    left:0;
+    right:0;
     z-index:100;
     display:flex;
     align-items:center;
     justify-content:space-between;
     gap:16px;
-    margin:-28px -18px 24px;
-    padding:18px;
+    width:100%;
+    min-height:76px;
+    margin:0;
+    padding:18px max(18px,calc((100vw - 1080px)/2 + 18px));
     background:#000D1E;
     border-bottom:1px solid rgba(249,180,24,0.18);
     box-shadow:0 8px 24px rgba(0,13,30,0.28);
@@ -164,7 +168,7 @@
     font-weight:700;
     margin:0 0 8px;
     letter-spacing:-0.01em;
-    color:#F3F6FA;
+    color:var(--text);
   }
   .hero p{
     color:var(--text-muted);
@@ -179,13 +183,21 @@
     gap:20px;
     align-items:start;
     margin-top:24px;
+    min-width:0;
+  }
+  .layout > *,
+  .panel,
+  #output-panel,
+  #output-content{
+    min-width:0;
+    max-width:100%;
   }
   @media (max-width:800px){
     .layout{grid-template-columns:1fr;}
   }
   @media (max-width:480px){
-    body{padding:18px 12px 48px;}
-    .navbar{margin:-18px -12px 20px;padding:16px 18px;}
+    body{padding:88px 12px 48px;}
+    .navbar{min-height:68px;margin:0;padding:16px 12px;}
     .brand-logo-wide{height:32px;}
     .nav-actions{gap:7px;}
     .visitor-counter{height:36px;min-width:62px;padding:0 9px;font-size:12.5px;}
@@ -203,6 +215,9 @@
     border-radius:18px;
     padding:22px;
     box-shadow:0 8px 24px rgba(10,30,60,0.07);
+    min-width:0;
+    max-width:100%;
+    overflow:hidden;
   }
 
   fieldset{
@@ -361,11 +376,16 @@
   .diagram-head h2{
     font-size:15px;
     margin:0;
+    max-width:100%;
+    overflow-wrap:anywhere;
+    word-break:break-word;
   }
   .diagram-head .orient-tag{
     font-family:'IBM Plex Mono', ui-monospace, monospace;
     font-size:11.5px;
     color:var(--text-muted);
+    max-width:100%;
+    overflow-wrap:anywhere;
   }
 
   .svg-frame{
@@ -373,10 +393,16 @@
     border-radius:8px;
     background:var(--waste-bg);
     padding:14px;
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    overflow:hidden;
   }
   .svg-frame svg{
     display:block;
     width:100%;
+    max-width:100%;
+    min-width:0;
     height:auto;
     max-height:520px;
   }
@@ -387,8 +413,9 @@
     gap:14px;
     margin:14px 0 4px;
     font-size:12.5px;
+    min-width:0;
   }
-  .legend-item{display:flex; align-items:center; gap:6px;}
+  .legend-item{display:flex; align-items:center; gap:6px;min-width:0;overflow-wrap:anywhere;}
   .swatch{
     width:13px; height:13px;
     border-radius:3px;
@@ -412,6 +439,7 @@
   .stat-card{
     background:var(--panel);
     padding:14px 15px;
+    min-width:0;
   }
   .stat-card .label{
     font-size:11.5px;
@@ -424,6 +452,7 @@
     font-family:'IBM Plex Mono', ui-monospace, monospace;
     font-size:19px;
     font-weight:600;
+    overflow-wrap:anywhere;
   }
   .stat-card .sub{
     font-family:'IBM Plex Mono', ui-monospace, monospace;
@@ -447,6 +476,8 @@
   .breakdown-scroll{
     overflow-x:auto;
     -webkit-overflow-scrolling:touch;
+    width:100%;
+    max-width:100%;
   }
   .breakdown table{
     width:100%;
@@ -512,6 +543,18 @@
   @media (max-width:560px){
     .wa-float-label{display:none;}
     .wa-float{padding:10px;}
+  }
+  @media (max-width:480px){
+    .layout{gap:16px;}
+    .panel{border-radius:16px;}
+    #output-panel{padding:16px;}
+    .diagram-head{align-items:flex-start;}
+    .diagram-head h2{font-size:14px;line-height:1.35;}
+    .svg-frame{padding:8px;}
+    .legend{gap:9px;font-size:11.5px;}
+    .stats{grid-template-columns:repeat(2,minmax(0,1fr));}
+    .stat-card{padding:11px 10px;}
+    .stat-card .value{font-size:15px;}
   }
 </style>
 </head>
