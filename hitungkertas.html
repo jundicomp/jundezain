@@ -699,22 +699,35 @@
     return null;
   }
 
-  fetch(counterUrl, {method:'GET', cache:'no-store'})
-    .then(function(response){
-      if(!response.ok) throw new Error('Counter tidak dapat diakses');
-      return response.text();
-    })
-    .then(function(text){
-      let payload = text;
-      try{ payload = JSON.parse(text); }catch(e){}
-      const count = findCount(payload);
-      if(count === null) throw new Error('Format counter tidak dikenali');
-      countEl.textContent = new Intl.NumberFormat('id-ID').format(count);
-    })
-    .catch(function(){
-      countEl.textContent = '—';
-      countEl.parentElement.title = 'Counter belum dapat dimuat';
-    });
+  let counterDone = false;
+  const counterScript = document.createElement('script');
+
+  function counterFailed(){
+    if(counterDone) return;
+    counterDone = true;
+    countEl.textContent = '—';
+    countEl.parentElement.title = 'Counter belum dapat dimuat';
+    counterScript.remove();
+  }
+
+  window.jundezainCounterCallback = function(payload){
+    if(counterDone) return;
+    const count = findCount(payload);
+    if(count === null){
+      counterFailed();
+      return;
+    }
+    counterDone = true;
+    countEl.textContent = new Intl.NumberFormat('id-ID').format(count);
+    countEl.parentElement.title = 'Jumlah kunjungan';
+    counterScript.remove();
+  };
+
+  counterScript.src = counterUrl + '?callback=jundezainCounterCallback&_=' + Date.now();
+  counterScript.async = true;
+  counterScript.onerror = counterFailed;
+  document.head.appendChild(counterScript);
+  window.setTimeout(counterFailed, 12000);
 })();
 
 (function(){
