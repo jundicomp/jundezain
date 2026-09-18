@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalkulator Potong Plano</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#E8F1FB;
+    --panel:#FFFFFF;
+    --text:#0A1420;
+    --text-muted:#5C6B7C;
+    --border:#E1E7EE;
+    --accent:#0B3D74;
+    --accent-gold:#F9B418;
+    --accent-ink:#FFFFFF;
+    --error:#C0392B;
+    --btn-grad-start:#1462A8;
+    --btn-grad-end:#000D1E;
+    --piece-main:#FFFFFF;
+    --piece-right:#FFFFFF;
+    --piece-bottom:#FFFFFF;
+    --piece-border:#B7C0CB;
+    --piece-text:#16324A;
+    --badge-fill:#000D1E;
+    --badge-text:#F9B418;
+    --waste-bg:#EEF1F4;
+    --waste-line:#C7D0DA;
+    --input-bg:#FBFCFE;
+    --shadow: 0 1px 2px rgba(10,20,32,0.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#000D1E;
+      --panel:#0A1B30;
+      --text:#F3F6FA;
+      --text-muted:#9FB0C2;
+      --border:#1C3350;
+      --accent:#5FB0EC;
+      --accent-gold:#F9B418;
+      --accent-ink:#FFFFFF;
+      --error:#FF6B5B;
+      --btn-grad-start:#2E7BC4;
+      --btn-grad-end:#0B2C50;
+      --piece-main:#FFFFFF;
+      --piece-right:#FFFFFF;
+      --piece-bottom:#FFFFFF;
+      --piece-border:#B7C0CB;
+      --piece-text:#16324A;
+      --badge-fill:#000D1E;
+      --badge-text:#F9B418;
+      --waste-bg:#0D2036;
+      --waste-line:#24405F;
+      --input-bg:#0A1B30;
+      --shadow: 0 1px 2px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#000D1E;
+    --panel:#0A1B30;
+    --text:#F3F6FA;
+    --text-muted:#9FB0C2;
+    --border:#1C3350;
+    --accent:#5FB0EC;
+    --accent-gold:#F9B418;
+    --accent-ink:#FFFFFF;
+    --error:#FF6B5B;
+    --btn-grad-start:#2E7BC4;
+    --btn-grad-end:#0B2C50;
+    --piece-main:#FFFFFF;
+    --piece-right:#FFFFFF;
+    --piece-bottom:#FFFFFF;
+    --piece-border:#B7C0CB;
+    --piece-text:#16324A;
+    --badge-fill:#000D1E;
+    --badge-text:#F9B418;
+    --waste-bg:#0D2036;
+    --waste-line:#24405F;
+    --input-bg:#0A1B30;
+    --shadow: 0 1px 2px rgba(0,0,0,0.35);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Space Grotesk', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+    line-height:1.45;
+    padding:28px 18px 60px;
+  }
+  .wrap{max-width:1080px;margin:0 auto;}
+
+  header{margin-bottom:22px; display:flex; align-items:center; gap:14px;}
+  header .brand-logo{
+    width:44px; height:44px;
+    border-radius:9px;
+    flex-shrink:0;
+  }
+  header .eyebrow{
+    font-family:'IBM Plex Mono', ui-monospace, monospace;
+    font-size:12.5px;
+    color:var(--accent-gold);
+    letter-spacing:0.02em;
+    margin-bottom:6px;
+  }
+  h1{
+    font-size:clamp(22px,3.4vw,30px);
+    font-weight:700;
+    margin:0 0 6px;
+    letter-spacing:-0.01em;
+  }
+  header p{
+    color:var(--text-muted);
+    max-width:62ch;
+    margin:0;
+    font-size:14.5px;
+  }
+
+  .layout{
+    display:grid;
+    grid-template-columns: 320px 1fr;
+    gap:20px;
+    align-items:start;
+    margin-top:24px;
+  }
+  @media (max-width:800px){
+    .layout{grid-template-columns:1fr;}
+  }
+  @media (max-width:480px){
+    body{padding:18px 12px 48px;}
+    .panel{padding:16px;}
+    .field-row{grid-template-columns:1fr; gap:10px;}
+    button.primary{padding:14px; font-size:15px;}
+    .preset-btn{padding:8px 10px; font-size:12px;}
+    .stat-card .value{font-size:17px;}
+  }
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:20px;
+    box-shadow:var(--shadow);
+  }
+
+  fieldset{
+    border:none;
+    padding:0;
+    margin:0 0 20px;
+  }
+  fieldset:last-of-type{margin-bottom:0;}
+  legend{
+    font-size:13px;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:var(--text-muted);
+    padding:0 0 10px;
+  }
+
+  .field-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  label{
+    display:block;
+    font-size:12.5px;
+    color:var(--text-muted);
+    margin-bottom:5px;
+  }
+  input[type="number"]{
+    width:100%;
+    font-family:'IBM Plex Mono', ui-monospace, monospace;
+    font-size:16px;
+    padding:10px 10px;
+    border:1px solid var(--border);
+    border-radius:7px;
+    background:var(--input-bg);
+    color:var(--text);
+  }
+  input[type="number"]:focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:1px;
+  }
+  .unit-hint{
+    font-family:'IBM Plex Mono', ui-monospace, monospace;
+    font-size:11.5px;
+    color:var(--text-muted);
+    margin-top:8px;
+  }
+
+  .presets{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin:10px 0 16px;
+  }
+  .preset-btn{
+    font-family:'IBM Plex Mono', ui-monospace, monospace;
+    font-size:11.5px;
+    padding:6px 9px;
+    border-radius:6px;
+    border:1px solid var(--border);
+    background:transparent;
+    color:var(--text);
+    cursor:pointer;
+  }
+  .preset-btn:hover{border-color:var(--accent); color:var(--accent);}
+
+  .gap-note{
+    font-size:12px;
+    color:var(--text-muted);
+    margin:4px 0 0;
+  }
+
+  button.primary{
+    width:100%;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:14.5px;
+    padding:12px 14px;
+    border-radius:8px;
+    border:none;
+    background:linear-gradient(135deg, var(--btn-grad-start), var(--btn-grad-end));
+    color:var(--accent-ink);
+    cursor:pointer;
+    margin-top:4px;
+  }
+  button.primary:hover{filter:brightness(1.1);}
+  button.primary:focus-visible{outline:2px solid var(--accent-gold); outline-offset:2px;}
+
+  .ghost-btn{
+    font-family:'IBM Plex Mono', ui-monospace, monospace;
+    font-size:12px;
+    padding:8px 11px;
+    border-radius:7px;
+    border:1px solid var(--border);
+    background:var(--panel);
+    color:var(--accent);
+    cursor:pointer;
+  }
+  .ghost-btn:hover{border-color:var(--accent);}
+
+  .error-box{
+    display:none;
+    font-size:13px;
+    color:var(--error);
+    background:color-mix(in srgb, var(--error) 12%, transparent);
+    border:1px solid var(--error);
+    border-radius:7px;
+    padding:9px 11px;
+    margin-top:12px;
+  }
+
+  .output-empty{
+    color:var(--text-muted);
+    font-size:14px;
+    padding:40px 10px;
+    text-align:center;
+  }
+
+  .diagram-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:14px;
+  }
+  .diagram-head h2{
+    font-size:15px;
+    margin:0;
+  }
+  .diagram-head .orient-tag{
+    font-family:'IBM Plex Mono', ui-monospace, monospace;
+    font-size:11.5px;
+    color:var(--text-muted);
+  }
+
+  .svg-frame{
+    border:1px solid var(--border);
+    border-radius:8px;
+    background:var(--waste-bg);
+    padding:14px;
+  }
+  .svg-frame svg{
+    display:block;
+    width:100%;
+    height:auto;
+    max-height:520px;
+  }
+
+  .legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+    margin:14px 0 4px;
+    font-size:12.5px;
+  }
+  .legend-item{display:flex; align-items:center; gap:6px;}
+  .swatch{
+    width:13px; height:13px;
+    border-radius:3px;
+    border:1px solid var(--piece-border);
+    flex-shrink:0;
+  }
+  .swatch.waste{
+    background-image: repeating-linear-gradient(45deg, var(--waste-line) 0, var(--waste-line) 2px, var(--waste-bg) 2px, var(--waste-bg) 6px);
+  }
+
+  .stats{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:1px;
+    background:var(--border);
+    border:1px solid var(--border);
+    border-radius:8px;
+    overflow:hidden;
+    margin-top:20px;
+  }
+  .stat-card{
+    background:var(--panel);
+    padding:14px 15px;
+  }
+  .stat-card .label{
+    font-size:11.5px;
+    color:var(--text-muted);
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    margin-bottom:5px;
+  }
+  .stat-card .value{
+    font-family:'IBM Plex Mono', ui-monospace, monospace;
+    font-size:19px;
+    font-weight:600;
+  }
+  .stat-card .sub{
+    font-family:'IBM Plex Mono', ui-monospace, monospace;
+    font-size:11.5px;
+    color:var(--text-muted);
+    margin-top:3px;
+  }
+  .stat-card.highlight .value{color:var(--accent);}
+
+  .breakdown{
+    margin-top:18px;
+    font-size:13px;
+  }
+  .breakdown h3{
+    font-size:13px;
+    margin:0 0 8px;
+    color:var(--text-muted);
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+  }
+  .breakdown-scroll{
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  .breakdown table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:440px;
+  }
+  .breakdown td, .breakdown th{
+    text-align:left;
+    padding:7px 8px;
+    border-bottom:1px solid var(--border);
+    font-size:12.5px;
+  }
+  .breakdown th{
+    color:var(--text-muted);
+    font-weight:500;
+    font-family:'IBM Plex Mono', ui-monospace, monospace;
+    font-size:11px;
+    text-transform:uppercase;
+  }
+  .breakdown td.num{
+    font-family:'IBM Plex Mono', ui-monospace, monospace;
+  }
+
+  footer{
+    margin-top:26px;
+    font-size:12px;
+    color:var(--text-muted);
+    max-width:70ch;
+  }
+
+  .wa-float{
+    position:fixed;
+    right:18px;
+    bottom:18px;
+    z-index:40;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    text-decoration:none;
+    background:#25D366;
+    color:#FFFFFF;
+    padding:10px 10px 10px 16px;
+    border-radius:999px;
+    box-shadow:0 4px 14px rgba(0,0,0,0.25);
+  }
+  .wa-float:hover{filter:brightness(1.05);}
+  .wa-float-label{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:13px;
+    font-weight:600;
+    white-space:nowrap;
+  }
+  .wa-float-icon{
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    background:#128C7E;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+  }
+  @media (max-width:560px){
+    .wa-float-label{display:none;}
+    .wa-float{padding:10px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <img class="brand-logo" src="data:image/png;base64,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vLDwG/eE8/s3BCkeAAAACXBIWXMAAC4jAAAuIwF4pT92AAADamlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSfvu78nIGlkPSdXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQnPz4NCjx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iPjxyZGY6UkRGIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyI+PHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9InV1aWQ6ZmFmNWJkZDUtYmEzZC0xMWRhLWFkMzEtZDMzZDc1MTgyZjFiIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iPjxkYzpjcmVhdG9yPjxyZGY6U2VxIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyI+PHJkZjpsaT5BbnRvbmp1bmRpPC9yZGY6bGk+PC9yZGY6U2VxPg0KCQkJPC9kYzpjcmVhdG9yPjwvcmRmOkRlc2NyaXB0aW9uPjxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PSJ1dWlkOmZhZjViZGQ1LWJhM2QtMTFkYS1hZDMxLWQzM2Q3NTE4MmYxYiIgeG1sbnM6ZXhpZj0iaHR0cDovL25zLmFkb2JlLmNvbS9leGlmLzEuMC8iPjxleGlmOkRhdGVUaW1lT3JpZ2luYWw+MjAyNi0wNi0yM1QwNjoxODoyMy4xMTQ8L2V4aWY6RGF0ZVRpbWVPcmlnaW5hbD48L3JkZjpEZXNjcmlwdGlvbj48cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0idXVpZDpmYWY1YmRkNS1iYTNkLTExZGEtYWQzMS1kMzNkNzUxODJmMWIiIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyI+PHhtcDpDcmVhdGVEYXRlPjIwMjYtMDYtMjNUMDY6MTg6MjMuMTE0PC94bXA6Q3JlYXRlRGF0ZT48L3JkZjpEZXNjcmlwdGlvbj48L3JkZjpSREY+PC94OnhtcG1ldGE+DQo8P3hw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" alt="Logo Jundezain">
+    <div>
+      <div class="eyebrow">JUNDEZAIN — TOOLS</div>
+      <h1>Kalkulator Potong Kertas Plano</h1>
+      <p>Hitung jumlah hasil potongan dari satu lembar plano, lengkap dengan layout pembagiannya dan sisa kertas yang tidak terpakai. Semua ukuran dalam milimeter (mm).</p>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- INPUT PANEL -->
+    <div class="panel">
+      <form id="calc-form" novalidate>
+
+        <fieldset>
+          <legend>1. Ukuran Kertas Plano</legend>
+          <div class="field-row">
+            <div>
+              <label for="planoW">Panjang (mm)</label>
+              <input type="number" id="planoW" min="1" step="0.1" required placeholder="contoh: 1090">
+            </div>
+            <div>
+              <label for="planoH">Lebar (mm)</label>
+              <input type="number" id="planoH" min="1" step="0.1" required placeholder="contoh: 790">
+            </div>
+          </div>
+          <div class="presets" id="presets"></div>
+          <p class="unit-hint" id="plano-name">Nama kertas: —</p>
+        </fieldset>
+
+        <fieldset>
+          <legend>2. Ukuran Hasil yang Diinginkan</legend>
+          <label for="cutPreset">Pilih ukuran kertas umum (opsional)</label>
+          <select id="cutPreset" style="width:100%; font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:14px; padding:9px 10px; border:1px solid var(--border); border-radius:7px; background:var(--input-bg); color:var(--text); margin-bottom:12px;">
+            <option value="">— Atau isi manual di bawah —</option>
+          </select>
+          <div class="field-row">
+            <div>
+              <label for="cutW">Panjang (mm)</label>
+              <input type="number" id="cutW" min="1" step="0.1" required placeholder="contoh: 210">
+            </div>
+            <div>
+              <label for="cutH">Lebar (mm)</label>
+              <input type="number" id="cutH" min="1" step="0.1" required placeholder="contoh: 297">
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; margin-bottom:10px;">
+            <button type="button" class="ghost-btn" id="rotate-cut-btn" style="flex:1;">↻ Putar Ukuran Hasil</button>
+            <button type="button" class="ghost-btn" id="random-cut-btn" style="flex:1;">🎲 Acak Susunan</button>
+          </div>
+          <p class="unit-hint" style="margin-top:-4px;">"Acak Susunan" mencoba kombinasi potongan portrait & landscape sekaligus dalam 1 plano.</p>
+          <p class="unit-hint" id="cut-name" style="margin-top:-2px;margin-bottom:12px;">Nama kertas: —</p>
+          <label for="gap">Jarak potong / kerf (mm) — opsional</label>
+          <input type="number" id="gap" min="0" step="0.1" value="0">
+          <p class="gap-note">Celah antar hasil potongan, misalnya toleransi pisau potong. Kosongkan / isi 0 jika tidak perlu.</p>
+        </fieldset>
+
+        <button type="submit" class="primary">Hitung Potongan</button>
+        <div class="error-box" id="error-box"></div>
+      </form>
+    </div>
+
+    <!-- OUTPUT PANEL -->
+    <div class="panel" id="output-panel">
+      <div class="output-empty" id="output-empty">
+        Isi ukuran plano dan ukuran hasil potongan di sebelah kiri, lalu klik <strong>Hitung Potongan</strong> untuk melihat layout dan hasilnya.
+      </div>
+
+      <div id="output-content" style="display:none;">
+        <div class="diagram-head">
+          <h2 id="diagram-title">Layout Potong</h2>
+          <span class="orient-tag" id="orient-tag"></span>
+        </div>
+
+        <div class="svg-frame" id="svg-frame"></div>
+
+        <div class="legend" id="legend"></div>
+
+        <div class="stats" id="stats"></div>
+
+        <div class="breakdown">
+          <h3>Rincian per Area Potong</h3>
+          <div class="breakdown-scroll">
+            <table>
+              <thead>
+                <tr><th>Area</th><th>Susunan</th><th>Orientasi</th><th>Jumlah</th></tr>
+              </thead>
+              <tbody id="breakdown-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    Perhitungan memakai pola potong guillotine 2 tahap: area utama diisi grid penuh, lalu sisa strip kanan dan sisa strip bawah dicoba diisi ulang (termasuk dengan orientasi diputar 90°) untuk memaksimalkan hasil. Perhitungan tidak memperhitungkan margin gripper mesin cetak atau toleransi register — tambahkan manual bila diperlukan untuk kebutuhan produksi.
+  </footer>
+
+</div>
+
+<a class="wa-float" href="https://wa.me/628117879021?text=Salam%20min%2C%20boleh%20info%20seputar%20web%20dan%20software%20aplikasi%3F%20Terimakasih%20ya" target="_blank" rel="noopener noreferrer" aria-label="Chat WhatsApp">
+  <span class="wa-float-label">Butuh web dan software cetak, WA kami</span>
+  <span class="wa-float-icon">
+    <svg viewBox="0 0 32 32" width="26" height="26" fill="#FFFFFF" aria-hidden="true">
+      <path d="M16.02 3C9.4 3 4 8.38 4 15c0 2.28.63 4.4 1.73 6.22L4 29l7.98-1.66A11.94 11.94 0 0 0 16.02 27C22.64 27 28 21.62 28 15S22.64 3 16.02 3Zm0 21.8c-1.94 0-3.75-.55-5.28-1.5l-.38-.23-4.73.98.99-4.6-.25-.4A9.7 9.7 0 0 1 6.2 15c0-5.42 4.4-9.8 9.82-9.8 5.4 0 9.8 4.38 9.8 9.8 0 5.42-4.4 9.8-9.8 9.8Zm5.4-7.34c-.3-.15-1.75-.87-2.02-.96-.27-.1-.47-.15-.66.15-.2.3-.76.96-.93 1.16-.17.2-.34.22-.64.08-.3-.15-1.24-.46-2.37-1.47-.88-.78-1.47-1.75-1.64-2.05-.17-.3-.02-.46.13-.61.13-.13.3-.34.44-.5.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.66-1.6-.9-2.2-.24-.57-.48-.5-.66-.5h-.56c-.2 0-.5.07-.77.37-.27.3-1 1-1 2.4 0 1.42 1.03 2.8 1.17 3 .15.2 2.03 3.1 4.93 4.35.69.3 1.22.47 1.64.6.69.22 1.32.19 1.82.11.55-.08 1.75-.72 2-1.4.24-.7.24-1.28.17-1.4-.07-.13-.27-.2-.56-.35Z"/>
+    </svg>
+  </span>
+</a>
+
+<script>
+(function(){
+  const PRESETS = [
+    {label:'65×100 cm', w:650, h:1000},
+    {label:'79×109 cm', w:790, h:1090},
+    {label:'61×86 cm', w:610, h:860},
+    {label:'72×102 cm', w:720, h:1020},
+  ];
+
+  const planoWEl = document.getElementById('planoW');
+  const planoHEl = document.getElementById('planoH');
+  const cutWEl = document.getElementById('cutW');
+  const cutHEl = document.getElementById('cutH');
+  const gapEl = document.getElementById('gap');
+  const form = document.getElementById('calc-form');
+  const errorBox = document.getElementById('error-box');
+  const outputEmpty = document.getElementById('output-empty');
+  const outputContent = document.getElementById('output-content');
+  const presetsWrap = document.getElementById('presets');
+
+  PRESETS.forEach(p=>{
+    const btn = document.createElement('button');
+    btn.type='button';
+    btn.className='preset-btn';
+    btn.textContent = p.label + ' (' + p.w + '×' + p.h + ' mm)';
+    btn.addEventListener('click', ()=>{
+      planoWEl.value = p.w;
+      planoHEl.value = p.h;
+      updateNameHints();
+    });
+    presetsWrap.appendChild(btn);
+  });
+
+  // Nama kertas standar (mm) untuk deteksi otomatis, cocok di orientasi apapun (dibolak-balik).
+  const PLANO_NAME_TABLE = [
+    {w:650, h:1000, name:'Plano 65×100 cm'},
+    {w:790, h:1090, name:'Plano 79×109 cm'},
+    {w:610, h:860,  name:'Plano 61×86 cm'},
+    {w:720, h:1020, name:'Plano 72×102 cm'},
+  ];
+  const CUT_NAME_TABLE = [
+    {w:841, h:1189, name:'A0'},
+    {w:594, h:841,  name:'A1'},
+    {w:420, h:594,  name:'A2'},
+    {w:297, h:420,  name:'A3'},
+    {w:210, h:297,  name:'A4'},
+    {w:148, h:210,  name:'A5'},
+    {w:105, h:148,  name:'A6'},
+    {w:74,  h:105,  name:'A7'},
+    {w:215, h:330,  name:'F4 / Folio'},
+    {w:216, h:279,  name:'Letter'},
+    {w:216, h:356,  name:'Legal'},
+  ];
+  function detectPaperName(w, h, table, tol){
+    for(const item of table){
+      const a = Math.abs(w-item.w)<=tol && Math.abs(h-item.h)<=tol;
+      const b = Math.abs(w-item.h)<=tol && Math.abs(h-item.w)<=tol;
+      if(a || b) return item.name;
+    }
+    return null;
+  }
+
+  // Dropdown pilihan cepat ukuran kertas standar — mengisi field Panjang/Lebar hasil,
+  // tetap bisa diubah manual sesudahnya kalau perlu ukuran custom.
+  const cutPresetEl = document.getElementById('cutPreset');
+  CUT_NAME_TABLE.forEach((item, i)=>{
+    const opt = document.createElement('option');
+    opt.value = String(i);
+    opt.textContent = `${item.name} (${item.w}×${item.h} mm)`;
+    cutPresetEl.appendChild(opt);
+  });
+  cutPresetEl.addEventListener('change', ()=>{
+    if(cutPresetEl.value==='') return;
+    const item = CUT_NAME_TABLE[parseInt(cutPresetEl.value,10)];
+    cutWEl.value = item.w;
+    cutHEl.value = item.h;
+    updateNameHints();
+    updateRotateButtonLabel();
+  });
+  function updateNameHints(){
+    const pw = parseFloat(planoWEl.value), ph = parseFloat(planoHEl.value);
+    const cw = parseFloat(cutWEl.value), ch = parseFloat(cutHEl.value);
+    const planoHint = document.getElementById('plano-name');
+    const cutHint = document.getElementById('cut-name');
+    if(pw>0 && ph>0){
+      const n = detectPaperName(pw, ph, PLANO_NAME_TABLE, 3);
+      planoHint.textContent = 'Nama kertas: ' + (n || 'ukuran non-standar');
+    } else {
+      planoHint.textContent = 'Nama kertas: —';
+    }
+    if(cw>0 && ch>0){
+      const n = detectPaperName(cw, ch, CUT_NAME_TABLE, 2);
+      cutHint.textContent = 'Nama kertas: ' + (n || 'ukuran non-standar');
+    } else {
+      cutHint.textContent = 'Nama kertas: —';
+    }
+  }
+  [planoWEl, planoHEl, cutWEl, cutHEl].forEach(el=>{
+    el.addEventListener('input', updateNameHints);
+  });
+  updateNameHints();
+
+  // Tombol putar UKURAN HASIL (bukan plano): tukar panjang<->lebar hasil, label tombol otomatis
+  // mengikuti orientasi saat ini (Landscape kalau panjang>=lebar, Portrait kalau sebaliknya).
+  const rotateBtn = document.getElementById('rotate-cut-btn');
+  function updateRotateButtonLabel(){
+    const cw = parseFloat(cutWEl.value), ch = parseFloat(cutHEl.value);
+    if(!cw || !ch){ rotateBtn.textContent = '↻ Putar Ukuran Hasil'; return; }
+    rotateBtn.textContent = cw >= ch ? '↻ Jadikan Portrait' : '↻ Jadikan Landscape';
+  }
+  function triggerRecalc(){
+    if(form.requestSubmit) form.requestSubmit();
+    else form.dispatchEvent(new Event('submit', {cancelable:true}));
+  }
+  rotateBtn.addEventListener('click', ()=>{
+    const cw = cutWEl.value, ch = cutHEl.value;
+    cutWEl.value = ch;
+    cutHEl.value = cw;
+    updateNameHints();
+    updateRotateButtonLabel();
+    triggerRecalc();
+  });
+  [cutWEl, cutHEl].forEach(el=>el.addEventListener('input', updateRotateButtonLabel));
+  updateRotateButtonLabel();
+
+  function fitGrid(bigW, bigH, itemW, itemH, gap){
+    if(itemW<=0 || itemH<=0 || bigW<=0 || bigH<=0){
+      return {cols:0, rows:0, count:0, usedW:0, usedH:0, itemW, itemH};
+    }
+    let cols = Math.floor((bigW+gap)/(itemW+gap));
+    let rows = Math.floor((bigH+gap)/(itemH+gap));
+    if(cols<0) cols=0;
+    if(rows<0) rows=0;
+    const usedW = cols>0 ? cols*itemW + (cols-1)*gap : 0;
+    const usedH = rows>0 ? rows*itemH + (rows-1)*gap : 0;
+    return {cols, rows, count:cols*rows, usedW, usedH, itemW, itemH};
+  }
+
+  function bestFit(bigW, bigH, w, h, gap){
+    const a = fitGrid(bigW, bigH, w, h, gap);
+    const b = fitGrid(bigW, bigH, h, w, gap);
+    return b.count > a.count ? b : a;
+  }
+
+  // Area utama SEKARANG memakai persis orientasi (w,h) yang diinput user — tidak lagi otomatis
+  // dicoba dua arah lalu diambil yang terbanyak. Ini supaya tombol "Putar Ukuran Hasil" benar-benar
+  // mengubah hasil perhitungan (misal karena arah serat kertas), bukan cuma tampilan.
+  // Sisa strip kanan & bawah tetap dicoba 2 arah (bestFit) karena itu cuma pengisian sisa/offcut,
+  // bukan keputusan orientasi utama.
+  function computeLayout(W, H, w, h, gap){
+    const main = fitGrid(W, H, w, h, gap);
+    const rightW = W - main.usedW;
+    const right = bestFit(rightW, H, w, h, gap);
+    const bottomH = H - main.usedH;
+    const bottom = bestFit(main.usedW, bottomH, w, h, gap);
+    const total = main.count + right.count + bottom.count;
+    return {
+      main, right, bottom, total,
+      offsets:{
+        rightX: main.usedW, rightY: 0,
+        bottomX: 0, bottomY: main.usedH
+      }
+    };
+  }
+
+  function fmtInt(n){ return Math.round(n).toLocaleString('id-ID'); }
+  function fmtPct(n){ return n.toLocaleString('id-ID', {minimumFractionDigits:1, maximumFractionDigits:1}); }
+  function fmtM2(mm2){ return (mm2/1000000).toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+
+  function orientLabel(itemW, itemH, baseW, baseH){
+    if(itemW===baseW && itemH===baseH) return 'normal';
+    return 'diputar 90°';
+  }
+
+  function corderMark(x, y, dx, dy, len){
+    return `<path d="M ${x} ${y+dy*len} L ${x} ${y} L ${x+dx*len} ${y}" fill="none" stroke="var(--piece-border)" stroke-width="1.6" vector-effect="non-scaling-stroke" opacity="0.55"/>`;
+  }
+
+  // Format angka utk label di diagram: TANPA pemisah ribuan (biar "1050" tidak terbaca
+  // seperti "1.050" yang mengecoh/terlihat seperti angka desimal).
+  function fmtDim(n){
+    const r = Math.round(n*10)/10;
+    if(Number.isInteger(r)) return String(r);
+    return r.toFixed(1).replace('.', ',');
+  }
+
+  // Ukuran font label per-potongan dihitung dari target ukuran PIKSEL (menyamai ukuran font
+  // lain di halaman web ini), dikonversi ke satuan mm/viewBox pakai skala render saat ini
+  // (mmPerPx, diukur dari lebar kotak diagram sesungguhnya) — lalu dibatasi supaya tetap muat
+  // di potongan terkecil dan masih menyisakan ruang untuk badge nomor di tengah.
+  function computeCellLabelFontSize(W, H, regions, mmPerPx, targetPx){
+    const dims = regions.filter(r=>r && r.count>0).map(r=>Math.min(r.itemW, r.itemH));
+    const smallest = dims.length ? Math.min(...dims) : Math.min(W,H);
+    let fs = targetPx * mmPerPx;
+    fs = Math.min(fs, smallest*0.24);
+    return Math.max(fs, 0.5);
+  }
+
+  // Gambar 1 area (grid potongan) — SETIAP sel diberi label ukuran + nomor urut dalam lingkaran
+  // kontras. Angka panjang ditulis horizontal dekat sisi atas sel (posisi sumbu panjang), angka
+  // lebar ditulis vertikal dekat sisi kiri sel (posisi sumbu lebar). Nomor urut diletakkan tepat
+  // di tengah sel; counter jalan terus lintas area (area utama → strip kanan → strip bawah),
+  // jadi kalau totalnya 10 lembar, nomornya otomatis 1 sampai 10.
+  function buildRegion(region, offsetX, offsetY, gap, fillVar, fontSize, counterRef){
+    let out = '';
+    const {cols, rows, itemW, itemH} = region;
+    const showLabels = fontSize*3.2 <= Math.min(itemW, itemH);
+    const radius = Math.min(itemW, itemH)*0.17;
+    const badgeFs = radius*1.05;
+    for(let r=0; r<rows; r++){
+      for(let c=0; c<cols; c++){
+        const x = offsetX + c*(itemW+gap);
+        const y = offsetY + r*(itemH+gap);
+        out += `<rect x="${x}" y="${y}" width="${itemW}" height="${itemH}" fill="${fillVar}" stroke="var(--piece-border)" stroke-width="1.4" vector-effect="non-scaling-stroke"/>`;
+        if(showLabels){
+          const wx = x+itemW/2, wy = y+fontSize*1.05;
+          const hx = x+fontSize*1.05, hy = y+itemH/2;
+          out += `<text x="${wx.toFixed(2)}" y="${wy.toFixed(2)}" text-anchor="middle" dominant-baseline="middle" font-family="'IBM Plex Mono', monospace" font-size="${fontSize.toFixed(2)}" fill="var(--piece-text)">${fmtDim(itemW)}</text>`;
+          out += `<text x="${hx.toFixed(2)}" y="${hy.toFixed(2)}" text-anchor="middle" dominant-baseline="middle" font-family="'IBM Plex Mono', monospace" font-size="${fontSize.toFixed(2)}" fill="var(--piece-text)" transform="rotate(-90 ${hx.toFixed(2)} ${hy.toFixed(2)})">${fmtDim(itemH)}</text>`;
+        }
+        counterRef.n += 1;
+        const ncx = x+itemW/2, ncy = y+itemH/2;
+        out += `<circle cx="${ncx.toFixed(2)}" cy="${ncy.toFixed(2)}" r="${radius.toFixed(2)}" fill="var(--badge-fill)" opacity="0.96"/>`;
+        out += `<text x="${ncx.toFixed(2)}" y="${ncy.toFixed(2)}" text-anchor="middle" dominant-baseline="central" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="${badgeFs.toFixed(2)}" fill="var(--badge-text)">${counterRef.n}</text>`;
+      }
+    }
+    return out;
+  }
+
+  // Menghitung persegi-persegi sisa (waste) secara eksplisit dari partisi guillotine yang sama
+  // dengan computeLayout — bukan cuma warna hatch, tapi persegi nyata dengan lebar & tinggi pasti.
+  // Catatan penting: lebar strip sisa BAWAH = lebar area utama (bukan lebar plano penuh).
+  // Ini karena urutan potongnya: strip KANAN dipotong lebih dulu sepanjang penuh tinggi plano,
+  // baru sisa di BAWAH area utama dipotong terpisah dari sisa lebar yang tersisa setelah itu.
+  // Jadi dua kotak sisa ini memang berbeda ukuran & bukan salah hitung — sudah diberi garis
+  // putus-putus di sekelilingnya di diagram supaya batasnya kelihatan jelas.
+  function computeWasteRects(W, H, layout){
+    const region2W = W - layout.main.usedW, region2H = H;
+    const region3W = layout.main.usedW, region3H = H - layout.main.usedH;
+    const rx = layout.offsets.rightX, ry = layout.offsets.rightY;
+    const bx = layout.offsets.bottomX, by = layout.offsets.bottomY;
+    const cand = [
+      {x: rx+layout.right.usedW, y: ry, w: region2W-layout.right.usedW, h: region2H},
+      {x: rx, y: ry+layout.right.usedH, w: layout.right.usedW, h: region2H-layout.right.usedH},
+      {x: bx+layout.bottom.usedW, y: by, w: region3W-layout.bottom.usedW, h: region3H},
+      {x: bx, y: by+layout.bottom.usedH, w: layout.bottom.usedW, h: region3H-layout.bottom.usedH},
+    ];
+    return cand.filter(r=>r.w>0.5 && r.h>0.5);
+  }
+
+  function fitFontSize(boxW, boxH, text, vertical){
+    const avail = vertical ? boxH : boxW;
+    const availCross = vertical ? boxW : boxH;
+    const fsFromLength = (avail*0.85) / Math.max(text.length*0.62, 0.001);
+    const fsFromCross = availCross*0.75;
+    return Math.min(fsFromLength, fsFromCross);
+  }
+
+  // Label sisa: font berbasis target ukuran piksel (menyamai ukuran font web), baru diputar 90°
+  // atau diperkecil kalau memang tidak cukup ruang secara horizontal. Tiap kotak sisa diberi garis
+  // putus-putus di sekelilingnya supaya batas antar-kotak sisa terlihat jelas.
+  function drawWasteLabels(wasteRects, mmPerPx, targetPx){
+    let out = '';
+    const baseFs = targetPx * mmPerPx;
+    const floorFs = (targetPx*0.55) * mmPerPx;
+    wasteRects.forEach(r=>{
+      out += `<rect x="${r.x.toFixed(2)}" y="${r.y.toFixed(2)}" width="${r.w.toFixed(2)}" height="${r.h.toFixed(2)}" fill="none" stroke="var(--waste-line)" stroke-width="1.2" stroke-dasharray="4 3" vector-effect="non-scaling-stroke"/>`;
+      const cx = r.x+r.w/2, cy = r.y+r.h/2;
+      const line = fmtDim(r.w)+'×'+fmtDim(r.h);
+      let fs = baseFs, vertical = false;
+      if(fitFontSize(r.w, r.h, line, false) < baseFs){
+        if(fitFontSize(r.w, r.h, line, true) >= baseFs){
+          vertical = true;
+        } else {
+          const fsH = fitFontSize(r.w, r.h, line, false);
+          const fsV = fitFontSize(r.w, r.h, line, true);
+          if(fsV > fsH){ fs = fsV; vertical = true; } else { fs = fsH; }
+        }
+      }
+      if(fs < floorFs) return;
+      out += labelGroup(cx, cy, [line], fs, vertical, 'var(--text)', 'var(--panel)');
+    });
+    return out;
+  }
+
+  // Menulis 1 baris teks terpusat di titik (cx,cy). pillColor opsional untuk kotak latar
+  // semi-transparan di belakang teks (dipakai di area sisa, supaya tetap terbaca di atas pola hatch).
+  function labelGroup(cx, cy, lines, fs, vertical, textColor, pillColor){
+    const lineHeight = fs*1.18;
+    const longest = Math.max(...lines.map(l=>String(l).length));
+    const blockW = longest*fs*0.62;
+    const blockH = lines.length*lineHeight;
+    const firstY = -((lines.length-1)*lineHeight)/2;
+    let inner = '';
+    if(pillColor){
+      const padX = fs*0.55, padY = fs*0.32;
+      const pillW = blockW+padX*2, pillH = blockH+padY*2;
+      inner += `<rect x="${(-pillW/2).toFixed(2)}" y="${(-pillH/2).toFixed(2)}" width="${pillW.toFixed(2)}" height="${pillH.toFixed(2)}" rx="${(fs*0.22).toFixed(2)}" fill="${pillColor}" opacity="0.85"/>`;
+    }
+    inner += `<text x="0" y="${firstY.toFixed(2)}" text-anchor="middle" dominant-baseline="middle" font-family="'IBM Plex Mono', monospace" font-size="${fs.toFixed(2)}" fill="${textColor}">`;
+    inner += lines.map((l,i)=>`<tspan x="0" dy="${i===0?0:lineHeight.toFixed(2)}">${l}</tspan>`).join('');
+    inner += `</text>`;
+    const rot = vertical ? ' rotate(-90)' : '';
+    return `<g transform="translate(${cx.toFixed(2)} ${cy.toFixed(2)})${rot}">${inner}</g>`;
+  }
+
+  function renderSVG(W, H, layout, w, h, gap, mmPerPx){
+    const markLen = Math.max(6, Math.min(W,H)*0.02);
+    let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">`;
+    svg += `<defs>
+      <pattern id="hatch" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <rect width="10" height="10" fill="var(--waste-bg)"/>
+        <line x1="0" y1="0" x2="0" y2="10" stroke="var(--waste-line)" stroke-width="2.4"/>
+      </pattern>
+    </defs>`;
+    svg += `<rect x="0" y="0" width="${W}" height="${H}" fill="url(#hatch)" stroke="var(--piece-border)" stroke-width="2" vector-effect="non-scaling-stroke"/>`;
+
+    const fontSize = computeCellLabelFontSize(W, H, [layout.main, layout.right, layout.bottom], mmPerPx, 12.5);
+    const counter = {n:0};
+    svg += buildRegion(layout.main, 0, 0, gap, 'var(--piece-main)', fontSize, counter);
+    svg += buildRegion(layout.right, layout.offsets.rightX, layout.offsets.rightY, gap, 'var(--piece-right)', fontSize, counter);
+    svg += buildRegion(layout.bottom, layout.offsets.bottomX, layout.offsets.bottomY, gap, 'var(--piece-bottom)', fontSize, counter);
+
+    const wasteRects = computeWasteRects(W, H, layout);
+    svg += drawWasteLabels(wasteRects, mmPerPx, 12);
+
+    svg += corderMark(0, 0, 1, 1, markLen);
+    svg += corderMark(W, 0, -1, 1, markLen);
+    svg += corderMark(0, H, 1, -1, markLen);
+    svg += corderMark(W, H, -1, -1, markLen);
+
+    svg += `</svg>`;
+    return svg;
+  }
+
+  // === Susunan campuran (portrait + landscape dalam 1 plano) ===
+  // Satu "band" = sebidang area plano (hasil belah 1x, vertikal atau horizontal) yang diisi grid
+  // dengan SATU orientasi. fitBand menghitung grid utk band tsb.
+  function fitBand(band, w, h, gap){
+    const itemW = band.orient==='rotated' ? h : w;
+    const itemH = band.orient==='rotated' ? w : h;
+    const grid = fitGrid(band.w, band.h, itemW, itemH, gap);
+    return {x:band.x, y:band.y, w:band.w, h:band.h, orient:band.orient, grid};
+  }
+  // Sisa (waste) di dalam 1 band: 2 persegi (kanan-dari-grid & bawah-dari-grid), pola yang sama
+  // dengan computeWasteRects tapi diterapkan per-band.
+  function bandWasteRects(b){
+    const cand = [
+      {x:b.x+b.grid.usedW, y:b.y, w:b.w-b.grid.usedW, h:b.h},
+      {x:b.x, y:b.y+b.grid.usedH, w:b.grid.usedW, h:b.h-b.grid.usedH},
+    ];
+    return cand.filter(r=>r.w>0.5 && r.h>0.5);
+  }
+  // Menghasilkan banyak kandidat susunan: 2 versi satu-arah (normal/diputar), plus berbagai
+  // kombinasi belah plano jadi 2 bidang (vertikal & horizontal) di mana tiap bidang boleh pakai
+  // orientasi berbeda — jadi ada yang portrait, ada yang landscape, dalam 1 lembar plano yang sama.
+  function generateMixedCandidates(W, H, w, h, gap){
+    const normal = {itemW:w, itemH:h, tag:'normal'};
+    const rotated = {itemW:h, itemH:w, tag:'rotated'};
+    const out = [];
+    const MAX_SPLITS = 60;
+
+    [[normal,rotated],[rotated,normal]].forEach(([A,B])=>{
+      const maxK = Math.min(Math.floor((W+gap)/(A.itemW+gap)), MAX_SPLITS);
+      for(let k=1; k<maxK; k++){
+        const splitX = k*A.itemW+(k-1)*gap;
+        const left = fitBand({x:0,y:0,w:splitX,h:H,orient:A.tag}, w,h,gap);
+        const right = fitBand({x:splitX,y:0,w:W-splitX,h:H,orient:B.tag}, w,h,gap);
+        out.push([left,right]);
+      }
+    });
+    [[normal,rotated],[rotated,normal]].forEach(([A,B])=>{
+      const maxK = Math.min(Math.floor((H+gap)/(A.itemH+gap)), MAX_SPLITS);
+      for(let k=1; k<maxK; k++){
+        const splitY = k*A.itemH+(k-1)*gap;
+        const top = fitBand({x:0,y:0,w:W,h:splitY,orient:A.tag}, w,h,gap);
+        const bottom = fitBand({x:0,y:splitY,w:W,h:H-splitY,orient:B.tag}, w,h,gap);
+        out.push([top,bottom]);
+      }
+    });
+    out.push([fitBand({x:0,y:0,w:W,h:H,orient:'normal'}, w,h,gap)]);
+    out.push([fitBand({x:0,y:0,w:W,h:H,orient:'rotated'}, w,h,gap)]);
+
+    return out;
+  }
+  function bandGroupTotal(group){
+    return group.reduce((sum,b)=>sum+b.grid.count, 0);
+  }
+
+  function renderMixedSVG(W, H, group, gap, mmPerPx){
+    const markLen = Math.max(6, Math.min(W,H)*0.02);
+    let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">`;
+    svg += `<defs>
+      <pattern id="hatch" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <rect width="10" height="10" fill="var(--waste-bg)"/>
+        <line x1="0" y1="0" x2="0" y2="10" stroke="var(--waste-line)" stroke-width="2.4"/>
+      </pattern>
+    </defs>`;
+    svg += `<rect x="0" y="0" width="${W}" height="${H}" fill="url(#hatch)" stroke="var(--piece-border)" stroke-width="2" vector-effect="non-scaling-stroke"/>`;
+
+    const fontSize = computeCellLabelFontSize(W, H, group.map(b=>b.grid), mmPerPx, 12.5);
+    const counter = {n:0};
+    group.forEach(b=>{
+      svg += buildRegion(b.grid, b.x, b.y, gap, 'var(--piece-main)', fontSize, counter);
+    });
+    // garis putus-putus di batas antar bidang, supaya kelihatan jelas ini beda orientasi
+    if(group.length===2){
+      const b0 = group[0];
+      if(Math.abs(b0.w-W)<0.01){ // belah horizontal (band atas/bawah)
+        const yy=b0.h;
+        svg += `<line x1="0" y1="${yy}" x2="${W}" y2="${yy}" stroke="var(--accent)" stroke-width="2" stroke-dasharray="8 5" vector-effect="non-scaling-stroke"/>`;
+      } else { // belah vertikal (band kiri/kanan)
+        const xx=b0.w;
+        svg += `<line x1="${xx}" y1="0" x2="${xx}" y2="${H}" stroke="var(--accent)" stroke-width="2" stroke-dasharray="8 5" vector-effect="non-scaling-stroke"/>`;
+      }
+    }
+
+    const wasteRects = group.flatMap(b=>bandWasteRects(b));
+    svg += drawWasteLabels(wasteRects, mmPerPx, 12);
+
+    svg += corderMark(0, 0, 1, 1, markLen);
+    svg += corderMark(W, 0, -1, 1, markLen);
+    svg += corderMark(0, H, 1, -1, markLen);
+    svg += corderMark(W, H, -1, -1, markLen);
+    svg += `</svg>`;
+    return svg;
+  }
+
+
+  // Mengukur lebar sesungguhnya (px) dari kotak diagram di halaman, dipakai supaya font label
+  // bisa "menyamai ukuran font web" secara akurat, bukan cuma persentase dari ukuran plano.
+  function getFrameContentWidthPx(){
+    const el = document.getElementById('svg-frame');
+    const cs = getComputedStyle(el);
+    const padL = parseFloat(cs.paddingLeft)||0;
+    const padR = parseFloat(cs.paddingRight)||0;
+    const w = el.clientWidth - padL - padR;
+    return w>40 ? w : 300;
+  }
+
+  let lastRenderState = null;
+  function renderAndShow(W, H, layout, w, h, gap){
+    const framePx = getFrameContentWidthPx();
+    const mmPerPx = W/framePx;
+    document.getElementById('svg-frame').innerHTML = renderSVG(W, H, layout, w, h, gap, mmPerPx);
+    lastRenderState = {mode:'standard', W, H, layout, w, h, gap};
+  }
+  function renderMixedAndShow(W, H, group, w, h, gap){
+    const framePx = getFrameContentWidthPx();
+    const mmPerPx = W/framePx;
+    document.getElementById('svg-frame').innerHTML = renderMixedSVG(W, H, group, gap, mmPerPx);
+    lastRenderState = {mode:'mixed', W, H, group, w, h, gap};
+  }
+  function debounce(fn, wait){
+    let t;
+    return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args), wait); };
+  }
+  window.addEventListener('resize', debounce(()=>{
+    if(!lastRenderState) return;
+    const s = lastRenderState;
+    if(s.mode==='mixed') renderMixedAndShow(s.W, s.H, s.group, s.w, s.h, s.gap);
+    else renderAndShow(s.W, s.H, s.layout, s.w, s.h, s.gap);
+  }, 150));
+
+  // Baca & validasi input dari form — dipakai bersama oleh tombol Hitung dan tombol Acak Susunan.
+  function readValidInputs(){
+    errorBox.style.display = 'none';
+    const W = parseFloat(planoWEl.value);
+    const H = parseFloat(planoHEl.value);
+    const w = parseFloat(cutWEl.value);
+    const h = parseFloat(cutHEl.value);
+    const gap = parseFloat(gapEl.value) || 0;
+    if(!W || !H || !w || !h || W<=0 || H<=0 || w<=0 || h<=0){
+      errorBox.textContent = 'Lengkapi semua ukuran dengan angka positif terlebih dahulu.';
+      errorBox.style.display = 'block';
+      return null;
+    }
+    if(gap<0){
+      errorBox.textContent = 'Jarak potong tidak boleh negatif.';
+      errorBox.style.display = 'block';
+      return null;
+    }
+    return {W,H,w,h,gap};
+  }
+
+  function renderLegend(items){
+    document.getElementById('legend').innerHTML = items.map(it =>
+      `<div class="legend-item"><span class="swatch${it.waste?' waste':''}"${it.waste?'':' style="background:var(--piece-main)"'}></span><span>${it.label}</span></div>`
+    ).join('');
+  }
+
+  function renderStats(total, W, H, w, h){
+    const luasPlano = W*H;
+    const luasTerpakai = total*(w*h);
+    const luasSisa = luasPlano-luasTerpakai;
+    const efisiensi = luasPlano>0 ? (luasTerpakai/luasPlano)*100 : 0;
+    document.getElementById('stats').innerHTML = `
+      <div class="stat-card highlight">
+        <div class="label">Total Hasil Potongan</div>
+        <div class="value">${fmtInt(total)} lembar</div>
+        <div class="sub">ukuran ${fmtInt(w)}×${fmtInt(h)} mm</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Luas Plano</div>
+        <div class="value">${fmtInt(luasPlano)} mm²</div>
+        <div class="sub">${fmtM2(luasPlano)} m²</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Luas Terpakai</div>
+        <div class="value">${fmtInt(luasTerpakai)} mm²</div>
+        <div class="sub">${fmtM2(luasTerpakai)} m²</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Sisa Kertas (Waste)</div>
+        <div class="value">${fmtInt(luasSisa)} mm²</div>
+        <div class="sub">${fmtM2(luasSisa)} m²</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Efisiensi Pemakaian</div>
+        <div class="value">${fmtPct(efisiensi)}%</div>
+        <div class="sub">dari total luas plano</div>
+      </div>
+    `;
+  }
+
+  function renderBreakdownBody(rows, total){
+    function rowHtml(r){
+      if(r.count === 0){
+        return `<tr><td>${r.label}</td><td class="num">—</td><td>—</td><td class="num">0</td></tr>`;
+      }
+      return `<tr>
+        <td>${r.label}</td>
+        <td class="num">${r.cols} × ${r.rows}</td>
+        <td>${r.orientText} (${fmtInt(r.itemW)}×${fmtInt(r.itemH)} mm)</td>
+        <td class="num">${r.count}</td>
+      </tr>`;
+    }
+    document.getElementById('breakdown-body').innerHTML =
+      rows.map(rowHtml).join('') +
+      `<tr><td><strong>Total</strong></td><td></td><td></td><td class="num"><strong>${total}</strong></td></tr>`;
+  }
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    const inputs = readValidInputs();
+    if(!inputs) return;
+    const {W,H,w,h,gap} = inputs;
+
+    const layout = computeLayout(W, H, w, h, gap);
+
+    if(layout.total === 0){
+      errorBox.textContent = 'Ukuran hasil potongan terlalu besar untuk muat di kertas plano ini, dalam orientasi apapun.';
+      errorBox.style.display = 'block';
+      outputEmpty.style.display = 'block';
+      outputContent.style.display = 'none';
+      return;
+    }
+
+    outputEmpty.style.display = 'none';
+    outputContent.style.display = 'block';
+
+    const planoName = detectPaperName(W, H, PLANO_NAME_TABLE, 3);
+    const cutName = detectPaperName(w, h, CUT_NAME_TABLE, 2);
+    document.getElementById('diagram-title').textContent =
+      `${planoName ? planoName+' ' : ''}(${fmtInt(W)}×${fmtInt(H)} mm) → hasil ${fmtInt(w)}×${fmtInt(h)} mm${cutName ? ' ('+cutName+')' : ''}`;
+    document.getElementById('orient-tag').textContent = 'ukuran hasil: ' + (w >= h ? 'Landscape' : 'Portrait');
+
+    renderAndShow(W, H, layout, w, h, gap);
+
+    renderLegend([
+      {label:`Area utama — ${layout.main.count} lbr`},
+      {label:`Sisa strip kanan — ${layout.right.count} lbr`},
+      {label:`Sisa strip bawah — ${layout.bottom.count} lbr`},
+      {label:'Sisa tidak terpakai', waste:true},
+    ]);
+
+    renderStats(layout.total, W, H, w, h);
+
+    renderBreakdownBody([
+      {label:'Area utama', cols:layout.main.cols, rows:layout.main.rows, orientText:orientLabel(layout.main.itemW, layout.main.itemH, w, h), itemW:layout.main.itemW, itemH:layout.main.itemH, count:layout.main.count},
+      {label:'Sisa strip kanan', cols:layout.right.cols, rows:layout.right.rows, orientText:orientLabel(layout.right.itemW, layout.right.itemH, w, h), itemW:layout.right.itemW, itemH:layout.right.itemH, count:layout.right.count},
+      {label:'Sisa strip bawah', cols:layout.bottom.cols, rows:layout.bottom.rows, orientText:orientLabel(layout.bottom.itemW, layout.bottom.itemH, w, h), itemW:layout.bottom.itemW, itemH:layout.bottom.itemH, count:layout.bottom.count},
+    ], layout.total);
+  });
+
+  // Tombol "Acak Susunan": bukan mengacak UKURAN, tapi mengacak SUSUNAN/POSISI potongan —
+  // mencoba plano dibelah jadi 2 bidang, masing-masing bidang boleh pakai orientasi berbeda
+  // (portrait & landscape sekaligus dalam 1 plano), lalu menampilkan salah satu kombinasi acak.
+  // Ukuran hasil (cutW/cutH) TIDAK PERNAH diubah — kalau sebuah bidang "diputar", itu potongan
+  // yang sama persis cuma diputar 90°, bukan ukuran lain. Kandidat yang hasilnya lebih SEDIKIT
+  // dari mode standar (tombol Hitung) dibuang dari pilihan acak, supaya tombol ini nggak pernah
+  // kasih hasil yang lebih jelek — hanya sama atau lebih banyak.
+  document.getElementById('random-cut-btn').addEventListener('click', ()=>{
+    const inputs = readValidInputs();
+    if(!inputs) return;
+    const {W,H,w,h,gap} = inputs;
+
+    const baselineTotal = computeLayout(W, H, w, h, gap).total;
+    const candidates = generateMixedCandidates(W, H, w, h, gap);
+    const notWorse = candidates.filter(g => bandGroupTotal(g) > 0 && bandGroupTotal(g) >= baselineTotal);
+    const pool = notWorse.length ? notWorse : candidates.filter(g=>bandGroupTotal(g)>0);
+    const finalPool = pool.length ? pool : candidates;
+    const group = finalPool[Math.floor(Math.random()*finalPool.length)];
+    const total = bandGroupTotal(group);
+
+    if(total === 0){
+      errorBox.textContent = 'Ukuran hasil potongan terlalu besar untuk muat di kertas plano ini.';
+      errorBox.style.display = 'block';
+      outputEmpty.style.display = 'block';
+      outputContent.style.display = 'none';
+      return;
+    }
+
+    outputEmpty.style.display = 'none';
+    outputContent.style.display = 'block';
+
+    const planoName = detectPaperName(W, H, PLANO_NAME_TABLE, 3);
+    document.getElementById('diagram-title').textContent =
+      `${planoName ? planoName+' ' : ''}(${fmtInt(W)}×${fmtInt(H)} mm) → susunan campuran ${fmtInt(w)}×${fmtInt(h)} mm (acak)`;
+    const cmpText = baselineTotal>0
+      ? ` — standar: ${baselineTotal} lbr, ini: ${total} lbr${total>baselineTotal ? ' (+'+(total-baselineTotal)+')' : ''}`
+      : '';
+    document.getElementById('orient-tag').textContent =
+      (group.length>1 ? 'acak — campuran portrait & landscape' : 'acak — satu arah') + cmpText;
+
+    renderMixedAndShow(W, H, group, w, h, gap);
+
+    const legendItems = group.map((b,i)=>({label:`Band ${i+1} (${b.orient==='rotated'?'diputar':'normal'}) — ${b.grid.count} lbr`}));
+    legendItems.push({label:'Sisa tidak terpakai', waste:true});
+    renderLegend(legendItems);
+
+    renderStats(total, W, H, w, h);
+
+    renderBreakdownBody(group.map((b,i)=>({
+      label:`Band ${i+1}`,
+      cols:b.grid.cols, rows:b.grid.rows,
+      orientText: b.orient==='rotated' ? 'diputar 90°' : 'normal',
+      itemW:b.grid.itemW, itemH:b.grid.itemH, count:b.grid.count
+    })), total);
+  });
+})();
+</script>
+</body>
+</html>
